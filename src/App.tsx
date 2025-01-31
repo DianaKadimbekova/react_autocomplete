@@ -14,7 +14,8 @@ export const App: React.FC<AutocompleteProps> = () => {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   //eslint-disable-next-line
-  const [selectedPerson, setSelectedPerson] = useState<null | typeof peopleFromServer[0]>(null);
+  const [selectedPerson, setSelectedPerson] = useState<null | (typeof peopleFromServer)[0]
+  >(null);
   const [isFocused, setIsFocused] = useState(false);
 
   const handleDebounceQuery = useCallback(
@@ -40,7 +41,12 @@ export const App: React.FC<AutocompleteProps> = () => {
     );
   }, [debouncedQuery]);
 
-  const handleSelectedPerson = (person: Person) => {
+  const handleSelectedPerson = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    person: Person,
+  ) => {
+    e.stopPropagation();
+
     setQuery(person.name);
     setSelectedPerson(person);
     setIsFocused(false);
@@ -76,7 +82,7 @@ export const App: React.FC<AutocompleteProps> = () => {
               onBlur={handleBlur}
             />
           </div>
-          {isFocused && filteredPeople.length > 0 && (
+          {filteredPeople.length > 0 && (
             <div
               className="dropdown-menu"
               role="menu"
@@ -88,9 +94,15 @@ export const App: React.FC<AutocompleteProps> = () => {
                     key={person.name}
                     className="dropdown-item"
                     data-cy="suggestion-item"
-                    onClick={() => handleSelectedPerson(person)}
+                    onClick={e => handleSelectedPerson(e, person)}
                   >
-                    <p className="has-text-link">{person.name}</p>
+                    <p
+                      className={
+                        person.sex === 'f' ? 'has-text-danger' : 'has-text-link'
+                      }
+                    >
+                      {person.name}
+                    </p>
                   </div>
                 ))}
               </div>
