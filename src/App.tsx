@@ -10,7 +10,7 @@ interface AutocompleteProps {
   onSelected: (person: Person | null) => void;
 }
 
-export const App: React.FC<AutocompleteProps> = () => {
+export const App: React.FC<AutocompleteProps> = ({ delay, onSelected }) => {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   //eslint-disable-next-line
@@ -20,7 +20,7 @@ export const App: React.FC<AutocompleteProps> = () => {
 
   const handleDebounceQuery = useCallback(
     debounce((value: string) => setDebouncedQuery(value), 300),
-    [],
+    [delay],
   );
 
   const handleChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +37,7 @@ export const App: React.FC<AutocompleteProps> = () => {
     }
 
     return peopleFromServer.filter(person =>
-      person.name.includes(debouncedQuery),
+      person.name.trim().includes(debouncedQuery),
     );
   }, [debouncedQuery]);
 
@@ -49,6 +49,7 @@ export const App: React.FC<AutocompleteProps> = () => {
 
     setQuery(person.name);
     setSelectedPerson(person);
+    onSelected(person);
     setIsFocused(false);
   };
 
